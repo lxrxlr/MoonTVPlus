@@ -95,6 +95,7 @@ export const UserMenu: React.FC = () => {
   const [defaultAggregateSearch, setDefaultAggregateSearch] = useState(true);
   const [doubanProxyUrl, setDoubanProxyUrl] = useState('');
   const [enableOptimization, setEnableOptimization] = useState(true);
+  const [speedTestTimeout, setSpeedTestTimeout] = useState(4000); // 测速超时时间（毫秒）
   const [fluidSearch, setFluidSearch] = useState(true);
   const [liveDirectConnect, setLiveDirectConnect] = useState(false);
   const [tmdbBackdropDisabled, setTmdbBackdropDisabled] = useState(false);
@@ -342,6 +343,11 @@ export const UserMenu: React.FC = () => {
         localStorage.getItem('enableOptimization');
       if (savedEnableOptimization !== null) {
         setEnableOptimization(JSON.parse(savedEnableOptimization));
+      }
+
+      const savedSpeedTestTimeout = localStorage.getItem('speedTestTimeout');
+      if (savedSpeedTestTimeout !== null) {
+        setSpeedTestTimeout(Number(savedSpeedTestTimeout));
       }
 
       const savedFluidSearch = localStorage.getItem('fluidSearch');
@@ -639,6 +645,13 @@ export const UserMenu: React.FC = () => {
     setEnableOptimization(value);
     if (typeof window !== 'undefined') {
       localStorage.setItem('enableOptimization', JSON.stringify(value));
+    }
+  };
+
+  const handleSpeedTestTimeoutChange = (value: number) => {
+    setSpeedTestTimeout(value);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('speedTestTimeout', String(value));
     }
   };
 
@@ -1438,6 +1451,63 @@ export const UserMenu: React.FC = () => {
                       </div>
                     </label>
                   </div>
+
+                  {/* 测速超时设置 */}
+                  {enableOptimization && (
+                    <div className='ml-4 mt-2 space-y-2'>
+                      <div className='flex items-center justify-between'>
+                        <span className='text-xs text-gray-600 dark:text-gray-400'>
+                          换源面板测速超时
+                        </span>
+                        <span className='text-xs font-medium text-gray-700 dark:text-gray-300'>
+                          {speedTestTimeout / 1000}秒
+                        </span>
+                      </div>
+                      <div className='flex items-center gap-2'>
+                        <input
+                          type='range'
+                          min='4000'
+                          max='30000'
+                          step='1000'
+                          value={speedTestTimeout}
+                          onChange={(e) => handleSpeedTestTimeoutChange(Number(e.target.value))}
+                          className='flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700'
+                          style={{
+                            background: `linear-gradient(to right, #10b981 0%, #10b981 ${((speedTestTimeout - 4000) / (30000 - 4000)) * 100}%, #e5e7eb ${((speedTestTimeout - 4000) / (30000 - 4000)) * 100}%, #e5e7eb 100%)`
+                          }}
+                        />
+                      </div>
+                      <div className='flex justify-between text-xs text-gray-500 dark:text-gray-400'>
+                        <button
+                          onClick={() => handleSpeedTestTimeoutChange(4000)}
+                          className={`px-2 py-0.5 rounded ${speedTestTimeout === 4000 ? 'bg-green-500 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                        >
+                          4秒
+                        </button>
+                        <button
+                          onClick={() => handleSpeedTestTimeoutChange(10000)}
+                          className={`px-2 py-0.5 rounded ${speedTestTimeout === 10000 ? 'bg-green-500 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                        >
+                          10秒
+                        </button>
+                        <button
+                          onClick={() => handleSpeedTestTimeoutChange(20000)}
+                          className={`px-2 py-0.5 rounded ${speedTestTimeout === 20000 ? 'bg-green-500 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                        >
+                          20秒
+                        </button>
+                        <button
+                          onClick={() => handleSpeedTestTimeoutChange(30000)}
+                          className={`px-2 py-0.5 rounded ${speedTestTimeout === 30000 ? 'bg-green-500 text-white' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}`}
+                        >
+                          30秒
+                        </button>
+                      </div>
+                      <p className='text-xs text-gray-500 dark:text-gray-400 italic'>
+                        注：此设置仅对换源面板测速生效，优选播放源时仍使用4秒超时
+                      </p>
+                    </div>
+                  )}
 
                   {/* 流式搜索 */}
                   <div className='flex items-center justify-between'>
